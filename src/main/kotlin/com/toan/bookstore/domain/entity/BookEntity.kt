@@ -3,6 +3,7 @@ package com.toan.bookstore.domain.entity
 import jakarta.persistence.*
 
 @Entity
+@Table(name = "books")
 data class BookEntity (
     @Id
     val isbn: String?,
