@@ -1,8 +1,8 @@
 package com.toan.bookstore.service.impl
 
-import com.toan.bookstore.domain.entity.AuthorEntity
 import com.toan.bookstore.domain.service.AuthorService
 import com.toan.bookstore.repository.AuthorRepository
+import com.toan.bookstore.testAuthorEntityA
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,21 +17,33 @@ class DefaultAuthorServiceTests @Autowired constructor(
 
     @Test
     fun `createAuthor persists author to database`() {
-        val testAuthor = AuthorEntity(
-            id = null,
-            name = "Test Author",
-            age = 54,
-            description = "The greatest Author in Latin America",
-            image = "authorA.png"
-        )
+        val testAuthor = testAuthorEntityA()
         val savedAuthor = underTest.saveAuthor(testAuthor)
 
-        authorRepository.findByIdOrNull(savedAuthor.id).run {
+        authorRepository.findByIdOrNull(savedAuthor.id)!!.run {
             assertThat(this).isNotNull()
-            assertThat(this?.id).isEqualTo(testAuthor.id)
-            assertThat(this?.name).isEqualTo(testAuthor.name)
-            assertThat(this?.age).isEqualTo(testAuthor.age)
-            assertThat(this?.description).isEqualTo(testAuthor.description)
+            assertThat(this.id).isEqualTo(testAuthor.id)
+            assertThat(this.name).isEqualTo(testAuthor.name)
+            assertThat(this.age).isEqualTo(testAuthor.age)
+            assertThat(this.description).isEqualTo(testAuthor.description)
+        }
+    }
+
+    @Test
+    fun `getManyAuthors returns a list of saved authors`() {
+        val savedAuthor = authorRepository.save(testAuthorEntityA())
+        val expected = listOf(savedAuthor)
+
+        underTest.getManyAuthors().run {
+            assertThat(size).isEqualTo(expected.size)
+            assertThat(this).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `getManyAuthors returns empty list when no authors in db`() {
+        underTest.getManyAuthors().run {
+            assertThat(this).isEmpty()
         }
     }
 }
