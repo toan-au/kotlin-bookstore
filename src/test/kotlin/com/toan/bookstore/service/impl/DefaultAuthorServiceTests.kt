@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class DefaultAuthorServiceTests @Autowired constructor(
     val underTest: AuthorService,
     val authorRepository: AuthorRepository,
@@ -45,5 +47,13 @@ class DefaultAuthorServiceTests @Autowired constructor(
         underTest.getManyAuthors().run {
             assertThat(this).isEmpty()
         }
+    }
+
+    @Test
+    fun `findAuthorById returns a single author when author exists`() {
+        val savedAuthor = authorRepository.save(testAuthorEntityA())
+
+        val recalledAuthor = underTest.findAuthorById(savedAuthor.id!!)
+        assertThat(recalledAuthor).isEqualTo(savedAuthor)
     }
 }

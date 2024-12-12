@@ -95,4 +95,41 @@ class AuthorControllerTests @Autowired constructor(
             content { jsonPath("$[2].id", equalTo(3)) }
         }
     }
+
+    @Test
+    fun `findAuthorById returns 404 when author does not exist`() {
+        every {
+            authorService.findAuthorById(any())
+        } answers {
+            null
+        }
+
+        mockMvc.get("/v1/authors/90000") {
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `findAuthorById returns 200 and single author when author is exists`() {
+        val testAuthor = authorService.saveAuthor(testAuthorEntityA(2))
+
+        every {
+            authorService.findAuthorById(any())
+        } answers {
+            testAuthor
+        }
+
+        mockMvc.get("/v1/authors/${testAuthor.id}") {
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isOk() }
+            content { jsonPath("$.id", equalTo(testAuthor.id?.toInt())) }
+            content { jsonPath("$.name", equalTo(testAuthor.name)) }
+            content { jsonPath("$.age", equalTo(testAuthor.age.toInt())) }
+            content { jsonPath("$.description", equalTo(testAuthor.description)) }
+            content { jsonPath("$.image", equalTo(testAuthor.image)) }
+        }
+    }
 }

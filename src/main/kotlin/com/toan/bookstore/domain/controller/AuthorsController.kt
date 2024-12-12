@@ -30,9 +30,9 @@ class AuthorsController(
 
     @GetMapping
     fun getManyAuthors(): ResponseEntity<List<AuthorDto>> {
-        val authorDtos = authorService.getManyAuthors().map {
+        val authors = authorService.getManyAuthors().map {
             it.toDto()
         }.toList()
-        return ResponseEntity.ok(authorDtos)
+        return ResponseEntity.ok(authors)
     }
 }
