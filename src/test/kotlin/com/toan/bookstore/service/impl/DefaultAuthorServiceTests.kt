@@ -4,6 +4,7 @@ import com.toan.bookstore.domain.service.AuthorService
 import com.toan.bookstore.repository.AuthorRepository
 import com.toan.bookstore.testAuthorEntityA
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -20,7 +21,7 @@ class DefaultAuthorServiceTests @Autowired constructor(
     @Test
     fun `createAuthor persists author to database`() {
         val testAuthor = testAuthorEntityA()
-        val savedAuthor = underTest.saveAuthor(testAuthor)
+        val savedAuthor = underTest.createAuthor(testAuthor)
 
         authorRepository.findByIdOrNull(savedAuthor.id)!!.run {
             assertThat(this).isNotNull()
@@ -28,6 +29,14 @@ class DefaultAuthorServiceTests @Autowired constructor(
             assertThat(this.name).isEqualTo(testAuthor.name)
             assertThat(this.age).isEqualTo(testAuthor.age)
             assertThat(this.description).isEqualTo(testAuthor.description)
+        }
+    }
+
+    @Test
+    fun `createAuthor throws IllegalArgumentException if authorEntity has an id`() {
+        val testAuthor = testAuthorEntityA(5)
+        assertThrows(IllegalArgumentException::class.java) {
+            underTest.createAuthor(testAuthor)
         }
     }
 
@@ -55,5 +64,24 @@ class DefaultAuthorServiceTests @Autowired constructor(
 
         val recalledAuthor = underTest.findAuthorById(savedAuthor.id!!)
         assertThat(recalledAuthor).isEqualTo(savedAuthor)
+    }
+
+    @Test
+    fun `updateAuthor throws IllegalStateException if authorEntity does not exist`() {
+        val savedAuthor = authorRepository.save(testAuthorEntityA())
+        assertThrows(IllegalStateException::class.java) {
+            underTest.updateAuthor(savedAuthor.id!! + 666L, savedAuthor)
+        }
+    }
+
+    @Test
+    fun `updateAuthor updates author in db`(){
+        val savedAuthor = authorRepository.save(testAuthorEntityA())
+        val updateAuthor = savedAuthor.copy(age=12)
+        underTest.updateAuthor(savedAuthor.id!!, updateAuthor).run {
+            assertThat(id).isEqualTo(savedAuthor.id)
+            assertThat(name).isEqualTo(updateAuthor.name)
+            assertThat(age).isEqualTo(12)
+        }
     }
 }

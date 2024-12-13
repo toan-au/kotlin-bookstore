@@ -1,5 +1,6 @@
 package com.toan.bookstore
 
+import com.toan.bookstore.domain.AuthorPatchRequestDto
 import com.toan.bookstore.domain.dto.AuthorDto
 import com.toan.bookstore.domain.entity.AuthorEntity
 
@@ -49,4 +50,9 @@ fun testAuthorEntityC(id: Long?=null) = AuthorEntity(
     age = 30,
     description = "Test description C",
     image = "image-c.png"
+)
+
+fun testAuthorPatchRequestDtoA() = AuthorPatchRequestDto(
+    name = "PATCHED NAME",
+    description = "PATCHED DESCRIPTION",
 )

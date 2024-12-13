@@ -1,7 +1,9 @@
 package com.toan.bookstore.domain.controller
 
+import com.toan.bookstore.domain.AuthorPatchRequestDto
 import com.toan.bookstore.domain.dto.AuthorDto
 import com.toan.bookstore.domain.service.AuthorService
+import com.toan.bookstore.toAuthorPatchRequest
 import com.toan.bookstore.toDto
 import com.toan.bookstore.toEntity
 import org.springframework.http.HttpStatus
@@ -16,8 +18,13 @@ class AuthorsController(
 
     @PostMapping
     fun createAuthor(@RequestBody authorDto: AuthorDto): ResponseEntity<AuthorDto> {
-        val savedAuthor = authorService.saveAuthor(authorDto.toEntity())
-        return ResponseEntity(savedAuthor.toDto(), HttpStatus.CREATED)
+        return try {
+            val savedAuthor = authorService.createAuthor(authorDto.toEntity())
+            ResponseEntity(savedAuthor.toDto(), HttpStatus.CREATED)
+        } catch (ex: IllegalArgumentException) {
+            ResponseEntity.badRequest().build()
+        }
+
     }
 
     @GetMapping("/{id}")
@@ -35,4 +42,37 @@ class AuthorsController(
         }.toList()
         return ResponseEntity.ok(authors)
     }
+
+    @PutMapping("/{id}")
+    fun fullUpdateAuthor(
+        @PathVariable id: Long,
+        @RequestBody authorDto: AuthorDto
+    ): ResponseEntity<AuthorDto> {
+        return try {
+            val updatedAuthor = authorService.updateAuthor(id, authorDto.toEntity())
+            ResponseEntity.ok(updatedAuthor.toDto())
+        } catch (ex: IllegalStateException) {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @PatchMapping("/{id}")
+    fun partialUpdateAuthor(
+        @PathVariable id: Long,
+        @RequestBody patchRequest: AuthorPatchRequestDto
+    ): ResponseEntity<AuthorDto> {
+        return try {
+            val patchedAuthor = authorService.patchAuthor(id, patchRequest.toAuthorPatchRequest())
+            ResponseEntity.ok(patchedAuthor.toDto())
+        } catch (ex: IllegalStateException) {
+             ResponseEntity.notFound().build()
+        }
+    }
+
+//    @DeleteMapping("/{id}")
+//    fun deleteAuthor(
+//        @PathVariable id: Long,
+//    ): ResponseEntity<Unit> {
+//
+//    }
 }

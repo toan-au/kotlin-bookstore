@@ -3,6 +3,7 @@ package com.toan.bookstore.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.toan.bookstore.*
+import com.toan.bookstore.domain.AuthorPatchRequestDto
 import com.toan.bookstore.domain.service.AuthorService
 import io.mockk.every
 import io.mockk.verify
@@ -13,12 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.web.servlet.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class AuthorControllerTests @Autowired constructor(
     val mockMvc: MockMvc,
     @MockkBean val authorService: AuthorService,
@@ -28,14 +29,14 @@ class AuthorControllerTests @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         every {
-            authorService.saveAuthor(any())
+            authorService.createAuthor(any())
         } answers {
             firstArg()
         }
     }
 
     @Test
-    fun `saveAuthor returns HTTP 201 CREATED on success`() {
+    fun `createAuthor returns HTTP 201 CREATED on success`() {
         val testAuthor = testAuthorDtoA()
         mockMvc.post("/v1/authors") {
             contentType = MediaType.APPLICATION_JSON
@@ -45,8 +46,9 @@ class AuthorControllerTests @Autowired constructor(
         }
     }
 
+
     @Test
-    fun `saveAuthor calls authorService to save author on success`() {
+    fun `createAuthor calls authorService to save author on success`() {
         val testAuthor = testAuthorDtoA()
         mockMvc.post("/v1/authors") {
             contentType = MediaType.APPLICATION_JSON
@@ -54,7 +56,22 @@ class AuthorControllerTests @Autowired constructor(
         }
 
         verify {
-            authorService.saveAuthor(testAuthor.toEntity())
+            authorService.createAuthor(testAuthor.toEntity())
+        }
+    }
+
+    @Test
+    fun `createAuthor returns 400 when author is given an id`() {
+        every {
+            authorService.createAuthor(any())
+        } throws IllegalArgumentException()
+
+        val testAuthor = testAuthorDtoA(5)
+        mockMvc.post("/v1/authors") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(testAuthor)
+        }.andExpect {
+            status { isBadRequest() }
         }
     }
 
@@ -113,7 +130,7 @@ class AuthorControllerTests @Autowired constructor(
 
     @Test
     fun `findAuthorById returns 200 and single author when author is exists`() {
-        val testAuthor = authorService.saveAuthor(testAuthorEntityA(2))
+        val testAuthor = authorService.createAuthor(testAuthorEntityA(2))
 
         every {
             authorService.findAuthorById(any())
@@ -130,6 +147,85 @@ class AuthorControllerTests @Autowired constructor(
             content { jsonPath("$.age", equalTo(testAuthor.age.toInt())) }
             content { jsonPath("$.description", equalTo(testAuthor.description)) }
             content { jsonPath("$.image", equalTo(testAuthor.image)) }
+        }
+    }
+
+    @Test
+    fun `updateAuthor returns 404 NOT FOUND when author does not exist`() {
+        every {
+            authorService.updateAuthor(any(), any())
+        } throws IllegalStateException()
+
+        val author = testAuthorDtoA()
+
+        mockMvc.put("/v1/authors/999") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(author)
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `updateAuthor returns 200 OK and updated author on success`() {
+        val author = testAuthorDtoA(2)
+        val update = author.copy(name = "UPDATED")
+
+        every {
+            authorService.updateAuthor(any(), any())
+        } answers {
+            update.toEntity()
+        }
+
+        mockMvc.put("/v1/authors/2") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(update)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.name", equalTo("UPDATED"))
+        }
+    }
+
+    @Test
+    fun `patchAuthor returns 404 NOT FOUND when author does not exist`() {
+        every {
+            authorService.patchAuthor(any(), any())
+        } throws IllegalStateException()
+
+        mockMvc.patch("/v1/authors/999") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(testAuthorPatchRequestDtoA())
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `patchAuthor returns 200 OK and patched author on success`() {
+        val author = testAuthorEntityA(2)
+        val patchRequest = AuthorPatchRequestDto(
+            name = "PATCHED NAME",
+            description = "PATCHED DESCRIPTION",
+        )
+
+        every {
+            authorService.patchAuthor(any(), any())
+        } answers {
+            author.copy(
+                name = patchRequest.name!!,
+                description = patchRequest.description!!,
+            )
+        }
+
+        mockMvc.patch("/v1/authors/${author.id}") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(testAuthorPatchRequestDtoA())
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.id", equalTo(author.id?.toInt()))
+            jsonPath("$.name", equalTo(patchRequest.name))
+            jsonPath("$.description", equalTo(patchRequest.description))
+            jsonPath("$.image", equalTo(author.image))
         }
     }
 }
