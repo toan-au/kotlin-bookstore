@@ -1,6 +1,6 @@
 package com.toan.bookstore.domain.dto
 
-class AuthorDto(
+data class AuthorDto(
     val id: Long?,
 
     val name: String,
