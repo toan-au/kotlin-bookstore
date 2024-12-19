@@ -1,8 +1,8 @@
-package com.toan.bookstore.domain.controller
+package com.toan.bookstore.controller
 
 import com.toan.bookstore.domain.AuthorPatchRequestDto
 import com.toan.bookstore.domain.dto.AuthorDto
-import com.toan.bookstore.domain.service.AuthorService
+import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.toAuthorPatchRequest
 import com.toan.bookstore.toDto
 import com.toan.bookstore.toEntity
@@ -69,10 +69,16 @@ class AuthorsController(
         }
     }
 
-//    @DeleteMapping("/{id}")
-//    fun deleteAuthor(
-//        @PathVariable id: Long,
-//    ): ResponseEntity<Unit> {
-//
-//    }
+    @DeleteMapping("/{id}")
+    fun deleteAuthor(
+        @PathVariable id: Long,
+    ): ResponseEntity<Unit> {
+        return try {
+            authorService.deleteAuthor(id)
+            ResponseEntity.noContent().build()
+        } catch (ex: IllegalStateException) {
+            ResponseEntity.notFound().build()
+        }
+
+    }
 }

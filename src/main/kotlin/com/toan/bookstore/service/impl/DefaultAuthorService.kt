@@ -1,9 +1,10 @@
-package com.toan.bookstore.domain.service.impl
+package com.toan.bookstore.service.impl
 
 import com.toan.bookstore.domain.AuthorPatchRequest
 import com.toan.bookstore.domain.entity.AuthorEntity
-import com.toan.bookstore.domain.service.AuthorService
+import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.repository.AuthorRepository
+import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -41,9 +42,15 @@ class DefaultAuthorService (
     }
 
     override fun findAuthorById(id: Long): AuthorEntity? =
-        authorRepository.findByIdOrNull(id)
+        authorRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("Author not found")
 
     override fun getManyAuthors(): List<AuthorEntity> =
         authorRepository.findAll()
+
+    @Transactional
+    override fun deleteAuthor(id: Long) {
+        checkNotNull(authorRepository.findByIdOrNull(id))
+        authorRepository.deleteById(id)
+    }
 
 }
