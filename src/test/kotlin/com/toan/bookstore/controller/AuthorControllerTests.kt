@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.toan.bookstore.*
 import com.toan.bookstore.domain.AuthorPatchRequestDto
-import com.toan.bookstore.domain.service.AuthorService
+import com.toan.bookstore.service.AuthorService
 import io.mockk.every
 import io.mockk.verify
+import jakarta.transaction.Transactional
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,12 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class AuthorControllerTests @Autowired constructor(
     val mockMvc: MockMvc,
     @MockkBean val authorService: AuthorService,
@@ -226,6 +226,32 @@ class AuthorControllerTests @Autowired constructor(
             jsonPath("$.name", equalTo(patchRequest.name))
             jsonPath("$.description", equalTo(patchRequest.description))
             jsonPath("$.image", equalTo(author.image))
+        }
+    }
+
+    @Test
+    fun `deleteAuthor returns 404 NOT FOUND when author does not exist`() {
+        every {
+            authorService.deleteAuthor(any())
+        } throws IllegalStateException()
+
+        mockMvc.delete("/v1/authors/2") {
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `deleteAuthor returns NO CONTENT when author exists`() {
+        every {
+            authorService.deleteAuthor(any())
+        } answers { }
+
+        mockMvc.delete("/v1/authors/2") {
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isNoContent() }
         }
     }
 }

@@ -17,4 +17,7 @@ data class AuthorEntity (
     val description: String,
 
     val image: String,
+
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "authorEntity")
+    val books: MutableList<BookEntity>? = mutableListOf(),
 )

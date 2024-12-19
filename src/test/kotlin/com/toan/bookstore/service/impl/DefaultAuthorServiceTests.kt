@@ -1,18 +1,20 @@
 package com.toan.bookstore.service.impl
 
-import com.toan.bookstore.domain.service.AuthorService
+import com.toan.bookstore.domain.AuthorPatchRequestDto
 import com.toan.bookstore.repository.AuthorRepository
+import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.testAuthorEntityA
+import com.toan.bookstore.toAuthorPatchRequest
+import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class DefaultAuthorServiceTests @Autowired constructor(
     val underTest: AuthorService,
     val authorRepository: AuthorRepository,
@@ -82,6 +84,51 @@ class DefaultAuthorServiceTests @Autowired constructor(
             assertThat(id).isEqualTo(savedAuthor.id)
             assertThat(name).isEqualTo(updateAuthor.name)
             assertThat(age).isEqualTo(12)
+        }
+    }
+
+    @Test
+    fun `patchAuthor throws IllegalStateException if authorEntity does not exist`() {
+        val savedAuthor = AuthorPatchRequestDto(
+            name = "PATCHED NAME"
+        )
+        assertThrows(IllegalStateException::class.java) {
+            underTest.patchAuthor(9999, savedAuthor.toAuthorPatchRequest())
+        }
+    }
+
+    @Test
+    fun `patchAuthor returns patched author on success`() {
+        val author = authorRepository.save(testAuthorEntityA())
+        val patchRequest = AuthorPatchRequestDto(
+            name = "PATCHED NAME",
+            description = "PATCHED DESCRIPTION",
+            age = 99
+        )
+
+        underTest.patchAuthor(author.id!!, patchRequest.toAuthorPatchRequest())
+    }
+
+    @Test
+    fun `deleteAuthor throws illegalStateException when author does not exist`() {
+        assertThrows(IllegalStateException::class.java) {
+            underTest.deleteAuthor(5)
+        }
+    }
+
+    @Test
+    fun `deleteAuthor deletes author from the db when they exist`() {
+        val author = authorRepository.save(testAuthorEntityA())
+        underTest.deleteAuthor(author.id!!)
+
+        val recalledAuthor = authorRepository.findByIdOrNull(author.id!!)
+        assertThat(recalledAuthor).isNull()
+    }
+
+    @Test
+    fun `deleteAuthor throws illegalStateException if author does not exist`() {
+        assertThrows(IllegalStateException::class.java) {
+            underTest.deleteAuthor(55555)
         }
     }
 }
