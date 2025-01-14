@@ -1,4 +1,4 @@
-package com.toan.bookstore.domain
+package com.toan.bookstore.domain.dto
 
 data class AuthorPatchRequestDto (
     val id: Long? = null,

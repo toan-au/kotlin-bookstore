@@ -1,8 +1,8 @@
 package com.toan.bookstore
 
-import com.toan.bookstore.domain.AuthorPatchRequestDto
-import com.toan.bookstore.domain.dto.AuthorDto
+import com.toan.bookstore.domain.dto.*
 import com.toan.bookstore.domain.entity.AuthorEntity
+import com.toan.bookstore.domain.entity.BookEntity
 
 fun testAuthorDtoA(id: Long?=null) = AuthorDto(
     id = id,
@@ -55,4 +55,20 @@ fun testAuthorEntityC(id: Long?=null) = AuthorEntity(
 fun testAuthorPatchRequestDtoA() = AuthorPatchRequestDto(
     name = "PATCHED NAME",
     description = "PATCHED DESCRIPTION",
+)
+
+fun testBookEntityA(isbn: String, author: AuthorEntity) = BookEntity(
+    isbn = isbn,
+    title = "Test Book A",
+    description = "Description A",
+    image = "book-image-a.png",
+    authorEntity = author,
+)
+
+fun testBookCreateRequestDtoA(isbn: String, author: AuthorSummaryDto) = BookCreateRequestDto(
+    isbn = isbn,
+    title = "Test Book A",
+    description = "Description A",
+    image = "book-image-a.png",
+    author = author,
 )

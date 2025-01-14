@@ -3,7 +3,7 @@ package com.toan.bookstore.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.toan.bookstore.*
-import com.toan.bookstore.domain.AuthorPatchRequestDto
+import com.toan.bookstore.domain.dto.AuthorPatchRequestDto
 import com.toan.bookstore.service.AuthorService
 import io.mockk.every
 import io.mockk.verify

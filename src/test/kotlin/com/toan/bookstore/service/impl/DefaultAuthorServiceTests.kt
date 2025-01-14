@@ -1,6 +1,6 @@
 package com.toan.bookstore.service.impl
 
-import com.toan.bookstore.domain.AuthorPatchRequestDto
+import com.toan.bookstore.domain.dto.AuthorPatchRequestDto
 import com.toan.bookstore.repository.AuthorRepository
 import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.testAuthorEntityA
