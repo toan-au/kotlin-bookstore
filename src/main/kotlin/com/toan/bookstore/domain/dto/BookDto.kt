@@ -9,5 +9,5 @@ data class BookDto (
 
     val image: String,
 
-    val authorDto: AuthorDto,
+    val author: AuthorDto,
 )

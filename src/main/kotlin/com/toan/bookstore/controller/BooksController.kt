@@ -27,4 +27,12 @@ class BooksController(val bookService: BookService) {
              ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
         }
     }
+
+    @GetMapping
+    fun getBooks(@RequestParam author: Long?): ResponseEntity<List<BookDto>> {
+        val recalledBooks =  bookService.getManyBooks(author).map {
+            it.toDto()
+        }
+        return ResponseEntity(recalledBooks, HttpStatus.OK)
+    }
 }

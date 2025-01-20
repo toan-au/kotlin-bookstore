@@ -42,7 +42,7 @@ class DefaultAuthorService (
     }
 
     override fun findAuthorById(id: Long): AuthorEntity? =
-        authorRepository.findByIdOrNull(id) ?: throw EntityNotFoundException("Author not found")
+        authorRepository.findByIdOrNull(id)
 
     override fun getManyAuthors(): List<AuthorEntity> =
         authorRepository.findAll()

@@ -30,7 +30,7 @@ fun BookEntity.toDto(): BookDto = BookDto(
     title = this.title,
     description = this.description,
     image = this.image,
-    authorDto = this.authorEntity.toDto(),
+    author = this.authorEntity.toDto(),
 )
 
 fun BookDto.toEntity(): BookEntity = BookEntity(
@@ -38,7 +38,7 @@ fun BookDto.toEntity(): BookEntity = BookEntity(
     title = this.title,
     description = this.description,
     image = this.image,
-    authorEntity = this.authorDto.toEntity(),
+    authorEntity = this.author.toEntity(),
 )
 
 fun BookCreateRequestDto.toBookCreateRequest(): BookCreateRequest = BookCreateRequest(

@@ -1,8 +1,12 @@
 package com.toan.bookstore
 
+import com.toan.bookstore.domain.BookCreateRequest
 import com.toan.bookstore.domain.dto.*
 import com.toan.bookstore.domain.entity.AuthorEntity
 import com.toan.bookstore.domain.entity.BookEntity
+
+const val BOOK_A_ISBN = "123-456-789"
+const val BOOK_B_ISBN = "987-654-321"
 
 fun testAuthorDtoA(id: Long?=null) = AuthorDto(
     id = id,
@@ -65,10 +69,26 @@ fun testBookEntityA(isbn: String, author: AuthorEntity) = BookEntity(
     authorEntity = author,
 )
 
+fun testBookEntityB(isbn: String, author: AuthorEntity) = BookEntity(
+    isbn = isbn,
+    title = "Test Book B",
+    description = "Description B",
+    image = "book-image-b.png",
+    authorEntity = author,
+)
+
 fun testBookCreateRequestDtoA(isbn: String, author: AuthorSummaryDto) = BookCreateRequestDto(
     isbn = isbn,
     title = "Test Book A",
     description = "Description A",
     image = "book-image-a.png",
     author = author,
+)
+
+fun testBookCreateRequestA(isbn: String, authorId: Long) = BookCreateRequest(
+    isbn = isbn,
+    title = "Test Book A",
+    description = "Description A",
+    image = "book-image-a.png",
+    authorId = authorId,
 )

@@ -7,6 +7,7 @@ import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.service.BookService
 import com.toan.bookstore.toEntity
 import jakarta.transaction.Transactional
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
@@ -25,4 +26,12 @@ class DefaultBookService(
         val newBook = bookRepository.save(normalisedBook.toEntity(author))
         return Pair(newBook, !bookExists)
     }
+
+    override fun getManyBooks(authorId: Long?): List<BookEntity> {
+        return authorId?.let {
+            bookRepository.findByAuthorEntityId(it)
+        } ?: bookRepository.findAll()
+    }
+
+
 }
