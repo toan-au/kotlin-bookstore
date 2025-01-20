@@ -111,4 +111,20 @@ class DefaultBookServiceTests @Autowired constructor(
         assertThat(recalledBooks).hasSize(1)
         assertThat(recalledBooks[0]).isEqualTo(savedBook)
     }
+
+    @Test
+    fun `getBookByIsbn returns a BookEntity when the ISBN exists`() {
+        val testAuthor = authorRepository.save(testAuthorEntityA())
+        val savedBook = bookRepository.save(testBookEntityA(BOOK_A_ISBN, testAuthor))
+
+        val recalledBook = underTest.getBookByIsbn(BOOK_A_ISBN)
+        assertThat(recalledBook).isNotNull()
+        assertThat(recalledBook).isEqualTo(savedBook)
+    }
+
+    @Test
+    fun `getBookByIsbn returns null when the ISBN does not exist`() {
+        val recalledBook = underTest.getBookByIsbn("this-isbn-does-not-exist")
+        assertThat(recalledBook).isNull()
+    }
 }

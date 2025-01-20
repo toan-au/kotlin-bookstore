@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import com.toan.bookstore.*
 import com.toan.bookstore.domain.dto.AuthorSummaryDto
-import com.toan.bookstore.domain.dto.BookDto
 import com.toan.bookstore.repository.AuthorRepository
 import com.toan.bookstore.repository.BookRepository
 import com.toan.bookstore.service.BookService
@@ -69,7 +68,6 @@ class BooksControllerTests @Autowired constructor(
     fun `createBook returns 400 BAD_REQUEST when authorId does not exist`() {
         val isbn = "123-456-789"
         val author = testAuthorEntityA(1)
-        val book = testBookEntityA(isbn, author)
         val createRequest = testBookCreateRequestDtoA(isbn, AuthorSummaryDto(author.id!!))
 
         every {
@@ -162,6 +160,44 @@ class BooksControllerTests @Autowired constructor(
             status { isOk() }
             content { jsonPath("$[0].isbn", equalTo(BOOK_A_ISBN)) }
             content { jsonPath("$[0].author.id", equalTo(1)) }
+        }
+    }
+
+    @Test
+    fun `getBook returns 404 NOT_FOUND when book with given ISBN does not exist`() {
+        every {
+            bookService.getBookByIsbn(any())
+        } answers {
+            null
+        }
+
+        mockMvc.get("/v1/books/$BOOK_A_ISBN") {
+            contentType = MediaType.APPLICATION_JSON
+            accept(MediaType.APPLICATION_JSON)
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `getBook returns 200 OK when book with given ISBN exists`() {
+
+        val book = testBookEntityA(BOOK_A_ISBN, testAuthorEntityA(1L))
+        every {
+            bookService.getBookByIsbn(any())
+        } answers {
+            book
+        }
+
+        mockMvc.get("/v1/books/$BOOK_A_ISBN") {
+            contentType = MediaType.APPLICATION_JSON
+            accept(MediaType.APPLICATION_JSON)
+        }.andExpect {
+            status { isOk() }
+            content { jsonPath("$.isbn", equalTo(BOOK_A_ISBN)) }
+            content { jsonPath("$.title", equalTo(book.title)) }
+            content { jsonPath("$.description", equalTo(book.description)) }
+            content { jsonPath("$.image", equalTo(book.image)) }
         }
     }
 }

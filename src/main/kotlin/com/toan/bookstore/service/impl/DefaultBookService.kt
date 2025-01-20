@@ -7,7 +7,7 @@ import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.service.BookService
 import com.toan.bookstore.toEntity
 import jakarta.transaction.Transactional
-import org.springframework.http.ResponseEntity
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -32,6 +32,10 @@ class DefaultBookService(
             bookRepository.findByAuthorEntityId(it)
         } ?: bookRepository.findAll()
     }
+
+    override fun getBookByIsbn(isbn: String): BookEntity? =
+        bookRepository.findByIdOrNull(isbn)
+
 
 
 }

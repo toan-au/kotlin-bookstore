@@ -35,4 +35,11 @@ class BooksController(val bookService: BookService) {
         }
         return ResponseEntity(recalledBooks, HttpStatus.OK)
     }
+
+    @GetMapping("/{isbn}")
+    fun getBook(@PathVariable isbn: String): ResponseEntity<BookDto> {
+        return bookService.getBookByIsbn(isbn)?.let {
+            ResponseEntity(it.toDto(), HttpStatus.OK)
+        } ?: ResponseEntity.notFound().build()
+    }
 }
