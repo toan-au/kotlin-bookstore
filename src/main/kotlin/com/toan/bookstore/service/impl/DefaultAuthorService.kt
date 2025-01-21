@@ -2,9 +2,8 @@ package com.toan.bookstore.service.impl
 
 import com.toan.bookstore.domain.AuthorPatchRequest
 import com.toan.bookstore.domain.entity.AuthorEntity
-import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.repository.AuthorRepository
-import jakarta.persistence.EntityNotFoundException
+import com.toan.bookstore.service.AuthorService
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service

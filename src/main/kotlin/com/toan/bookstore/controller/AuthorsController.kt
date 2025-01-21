@@ -1,7 +1,7 @@
 package com.toan.bookstore.controller
 
-import com.toan.bookstore.domain.dto.AuthorPatchRequestDto
 import com.toan.bookstore.domain.dto.AuthorDto
+import com.toan.bookstore.domain.dto.AuthorPatchRequestDto
 import com.toan.bookstore.service.AuthorService
 import com.toan.bookstore.toAuthorPatchRequest
 import com.toan.bookstore.toDto

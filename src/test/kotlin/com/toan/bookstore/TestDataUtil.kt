@@ -16,22 +16,6 @@ fun testAuthorDtoA(id: Long?=null) = AuthorDto(
     image = "image-a.png"
 )
 
-fun testAuthorDtoB(id: Long?=null) = AuthorDto(
-    id = id,
-    name = "Test Author B",
-    age = 22,
-    description = "Test description B",
-    image = "image-b.png"
-)
-
-fun testAuthorDtoC(id: Long?=null) = AuthorDto(
-    id = id,
-    name = "Test Author C",
-    age = 30,
-    description = "Test description C",
-    image = "image-c.png"
-)
-
 fun testAuthorEntityA(id: Long?=null) = AuthorEntity(
     id = id,
     name = "Test Author A",
@@ -91,4 +75,9 @@ fun testBookCreateRequestA(isbn: String, authorId: Long) = BookCreateRequest(
     description = "Description A",
     image = "book-image-a.png",
     authorId = authorId,
+)
+
+fun testBookPatchRequestDtoA() = BookPatchRequestDto(
+    title = "PATCHED BOOK - A",
+    description = "Description - A",
 )

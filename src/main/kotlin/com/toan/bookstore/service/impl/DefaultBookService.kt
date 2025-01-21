@@ -1,6 +1,7 @@
 package com.toan.bookstore.service.impl
 
 import com.toan.bookstore.domain.BookCreateRequest
+import com.toan.bookstore.domain.BookPatchRequest
 import com.toan.bookstore.domain.entity.BookEntity
 import com.toan.bookstore.repository.BookRepository
 import com.toan.bookstore.service.AuthorService
@@ -36,6 +37,18 @@ class DefaultBookService(
     override fun getBookByIsbn(isbn: String): BookEntity? =
         bookRepository.findByIdOrNull(isbn)
 
+    override fun patchBook(isbn: String, patchRequest: BookPatchRequest): BookEntity {
+        val book = bookRepository.findByIdOrNull(isbn)
+        checkNotNull(book)
+
+        return bookRepository.save(
+            book.copy(
+                title = patchRequest.title ?: book.title,
+                description = patchRequest.description ?: book.description,
+                image = patchRequest.image ?: book.image,
+            )
+        )
+    }
 
 
 }

@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.put
 import org.springframework.test.web.servlet.result.StatusResultMatchersDsl
 
@@ -198,6 +199,49 @@ class BooksControllerTests @Autowired constructor(
             content { jsonPath("$.title", equalTo(book.title)) }
             content { jsonPath("$.description", equalTo(book.description)) }
             content { jsonPath("$.image", equalTo(book.image)) }
+        }
+    }
+
+    @Test
+    fun `patchBook returns NOT_FOUND when isbn does not exist`() {
+        every {
+            bookService.patchBook(any(), any())
+        } throws IllegalStateException("Book not found")
+
+        val patchRequest = testBookPatchRequestDtoA()
+
+        mockMvc.patch("/v1/books/$BOOK_A_ISBN") {
+            contentType = MediaType.APPLICATION_JSON
+            accept(MediaType.APPLICATION_JSON)
+            content = mapper.writeValueAsString(patchRequest)
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `patchBook returns an updated book and STATUS OK on success`() {
+        val book = testBookEntityA(BOOK_A_ISBN, testAuthorEntityA(1L))
+        val patchRequest = testBookPatchRequestDtoA()
+
+        every {
+            bookService.patchBook(any(), any())
+        } answers {
+            book.copy(
+                title = patchRequest.title!!,
+                description = patchRequest.description!!,
+            )
+        }
+
+        mockMvc.patch("/v1/books/$BOOK_A_ISBN") {
+            contentType = MediaType.APPLICATION_JSON
+            accept(MediaType.APPLICATION_JSON)
+            content = mapper.writeValueAsString(patchRequest)
+        }.andExpect {
+            status { isOk() }
+            content { jsonPath("$.isbn", equalTo(book.isbn)) }
+            content { jsonPath("$.title", equalTo(patchRequest.title)) }
+            content { jsonPath("$.description", equalTo(patchRequest.description)) }
         }
     }
 }

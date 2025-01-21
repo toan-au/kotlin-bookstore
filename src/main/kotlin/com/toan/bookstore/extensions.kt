@@ -2,10 +2,8 @@ package com.toan.bookstore
 
 import com.toan.bookstore.domain.AuthorPatchRequest
 import com.toan.bookstore.domain.BookCreateRequest
-import com.toan.bookstore.domain.dto.AuthorDto
-import com.toan.bookstore.domain.dto.AuthorPatchRequestDto
-import com.toan.bookstore.domain.dto.BookCreateRequestDto
-import com.toan.bookstore.domain.dto.BookDto
+import com.toan.bookstore.domain.BookPatchRequest
+import com.toan.bookstore.domain.dto.*
 import com.toan.bookstore.domain.entity.AuthorEntity
 import com.toan.bookstore.domain.entity.BookEntity
 
@@ -61,6 +59,12 @@ fun AuthorPatchRequestDto.toAuthorPatchRequest(): AuthorPatchRequest = AuthorPat
     id = this.id,
     name = this.name,
     age = this.age,
+    description = this.description,
+    image = this.image,
+)
+
+fun BookPatchRequestDto.toBookPatchRequest(): BookPatchRequest = BookPatchRequest(
+    title = this.title,
     description = this.description,
     image = this.image,
 )

@@ -1,13 +1,10 @@
 package com.toan.bookstore.service.impl
 
-import com.toan.bookstore.BOOK_A_ISBN
+import com.toan.bookstore.*
 import com.toan.bookstore.domain.BookCreateRequest
 import com.toan.bookstore.repository.AuthorRepository
 import com.toan.bookstore.repository.BookRepository
 import com.toan.bookstore.service.BookService
-import com.toan.bookstore.testAuthorEntityA
-import com.toan.bookstore.testBookCreateRequestA
-import com.toan.bookstore.testBookEntityA
 import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -126,5 +123,30 @@ class DefaultBookServiceTests @Autowired constructor(
     fun `getBookByIsbn returns null when the ISBN does not exist`() {
         val recalledBook = underTest.getBookByIsbn("this-isbn-does-not-exist")
         assertThat(recalledBook).isNull()
+    }
+
+    @Test
+    fun `patchBook throws IllegalStateException if the book does not exist in db`() {
+        assertThrows<IllegalStateException> {
+            underTest.patchBook(BOOK_A_ISBN, testBookPatchRequestDtoA().toBookPatchRequest())
+        }
+    }
+
+    @Test
+    fun `patchBook partially updates a book if book exists`() {
+        val testAuthor = authorRepository.save(testAuthorEntityA())
+        val originalBook = bookRepository.save(testBookEntityA(BOOK_A_ISBN, testAuthor))
+
+        val patchRequest = testBookPatchRequestDtoA()
+        val patchedBook = underTest.patchBook(BOOK_A_ISBN, patchRequest.toBookPatchRequest())
+
+        assertThat(patchedBook).isNotNull()
+        assertThat(patchedBook).isEqualTo(
+            originalBook.copy(
+                title = patchRequest.title!!,
+                description = patchRequest.description!!,
+                image = patchRequest.image ?: originalBook.image,
+            )
+        )
     }
 }
