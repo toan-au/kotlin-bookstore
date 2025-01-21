@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.patch
-import org.springframework.test.web.servlet.put
+import org.springframework.test.web.servlet.*
 import org.springframework.test.web.servlet.result.StatusResultMatchersDsl
 
 @SpringBootTest
@@ -242,6 +239,20 @@ class BooksControllerTests @Autowired constructor(
             content { jsonPath("$.isbn", equalTo(book.isbn)) }
             content { jsonPath("$.title", equalTo(patchRequest.title)) }
             content { jsonPath("$.description", equalTo(patchRequest.description)) }
+        }
+    }
+
+    @Test
+    fun `deleteBook returns 204 NO_CONTENT when any isbn is provided`() {
+        every {
+            bookService.deleteBook(any())
+        } answers { }
+
+        mockMvc.delete("/v1/books/$BOOK_A_ISBN") {
+            contentType = MediaType.APPLICATION_JSON
+            accept(MediaType.APPLICATION_JSON)
+        }.andExpect {
+            status { isNoContent() }
         }
     }
 }

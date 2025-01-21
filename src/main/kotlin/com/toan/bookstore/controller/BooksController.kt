@@ -57,4 +57,10 @@ class BooksController(val bookService: BookService) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).build()
         }
     }
+
+    @DeleteMapping("/{isbn}")
+    fun deleteBook(@PathVariable isbn: String): ResponseEntity<Unit> {
+        bookService.deleteBook(isbn)
+        return ResponseEntity.noContent().build()
+    }
 }

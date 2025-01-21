@@ -50,5 +50,7 @@ class DefaultBookService(
         )
     }
 
-
+    override fun deleteBook(isbn: String) {
+        bookRepository.deleteById(isbn)
+    }
 }

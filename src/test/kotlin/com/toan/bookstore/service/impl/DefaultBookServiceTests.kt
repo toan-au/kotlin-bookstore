@@ -8,6 +8,7 @@ import com.toan.bookstore.service.BookService
 import jakarta.transaction.Transactional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -148,5 +149,28 @@ class DefaultBookServiceTests @Autowired constructor(
                 image = patchRequest.image ?: originalBook.image,
             )
         )
+    }
+
+    @Test
+    fun `deleteBook deletes an existing book from the db`() {
+        val testAuthor = authorRepository.save(testAuthorEntityA())
+        val testBook = bookRepository.save(testBookEntityA(BOOK_A_ISBN, testAuthor))
+
+        underTest.deleteBook(testBook.isbn!!)
+
+        val recalledBook = underTest.getBookByIsbn(BOOK_A_ISBN)
+        assertThat(recalledBook).isNull()
+    }
+
+    @Test
+    fun `deleteBook does nothing when deleting an isbn which does not exist in db`() {
+
+        val book = bookRepository.findByIdOrNull(BOOK_A_ISBN)
+        assertThat(book).isNull()
+
+        assertDoesNotThrow {
+            underTest.deleteBook(BOOK_A_ISBN)
+        }
+
     }
 }

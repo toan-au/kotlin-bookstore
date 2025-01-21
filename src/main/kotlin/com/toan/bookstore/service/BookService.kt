@@ -9,4 +9,5 @@ interface BookService {
     fun getManyBooks(authorId: Long? = null): List<BookEntity>
     fun getBookByIsbn(isbn: String): BookEntity?
     fun patchBook(isbn: String, patchRequest: BookPatchRequest): BookEntity
+    fun deleteBook(isbn: String)
 }
